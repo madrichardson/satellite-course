@@ -1,0 +1,13 @@
+install.packages(c(
+  "selenider",
+  "dplyr",
+  "httr2",
+  "readr",
+  "future",
+  "furrr",
+  "officer",
+  "magick",
+  "stringr",
+  "hrbrthemes",
+  "ggplot2"
+))
