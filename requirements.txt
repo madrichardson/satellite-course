@@ -2,5 +2,8 @@ pandas
 python-pptx
 Pillow
 requests
+
+
+
 selenium
 webdriver-manager
