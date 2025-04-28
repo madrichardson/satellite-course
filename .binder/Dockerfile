@@ -18,16 +18,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xterm \
     supervisor \
     python3-pip \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install real Chromium (not Snap!)
-RUN wget -qO - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-    chromium-browser \
-    chromium-driver \
-    && rm -rf /var/lib/apt/lists/*
+# Install Google Chrome
+RUN wget -q -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt install -y /tmp/google-chrome.deb && \
+    rm /tmp/google-chrome.deb
+
+# Install Chromedriver matching Chrome version
+RUN LATEST=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
+    wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/${LATEST}/chromedriver_linux64.zip && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
+    rm /tmp/chromedriver.zip && \
+    chmod +x /usr/local/bin/chromedriver
 
 # Install Python packages
 RUN pip install selenium python-pptx pandas Pillow requests webdriver-manager seaborn matplotlib
