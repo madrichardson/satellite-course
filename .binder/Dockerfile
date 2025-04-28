@@ -1,54 +1,52 @@
-# Start from Binder's base image
-FROM jupyter/base-notebook
+# Start from a base image
+FROM ubuntu:22.04
 
-# Set working directory
-WORKDIR /home/jovyan
+# Set non-interactive mode for apt
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system packages
-USER root
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install basic utilities
+RUN apt-get update && apt-get install -y \
     wget \
+    curl \
+    git \
     unzip \
-    gnupg \
-    ca-certificates \
+    supervisor \
     fluxbox \
+    xterm \
     xvfb \
     x11vnc \
-    novnc \
-    websockify \
-    xterm \
-    supervisor \
+    python3 \
     python3-pip \
+    python3-dev \
+    python3-setuptools \
+    python3-wheel \
+    python3-numpy \
+    python3-pandas \
+    python3-scipy \
+    python3-matplotlib \
+    python3-sklearn \
+    python3-seaborn \
+    python3-requests \
+    python3-yaml \
+    python3-pil \
+    chromium-browser \
+    chromium-driver \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chromium manually (non-snap)
-RUN wget -q https://github.com/ungoogled-software/ungoogled-chromium-debian/releases/download/117.0.5938.92-1/ungoogled-chromium_117.0.5938.92-1.debian_amd64.deb && \
-    apt install -y ./ungoogled-chromium_117.0.5938.92-1.debian_amd64.deb && \
-    rm ./ungoogled-chromium_117.0.5938.92-1.debian_amd64.deb
+# Install any Python packages
+RUN pip3 install --no-cache-dir \
+    jupyterlab \
+    selenium \
+    voila
 
-# Install matching Chromedriver manually
-RUN wget -q https://chromedriver.storage.googleapis.com/117.0.5938.92/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/local/bin/chromedriver && \
-    chmod +x /usr/local/bin/chromedriver && \
-    rm chromedriver_linux64.zip
+# Set up a default user
+RUN useradd -m -s /bin/bash jovyan
+USER jovyan
+WORKDIR /home/jovyan
 
-# Install Python packages
-RUN pip install selenium python-pptx pandas Pillow requests seaborn matplotlib
+# Expose default ports (optional for Binder)
+EXPOSE 8888
 
-# Set environment variables
-ENV DISPLAY=:1
-ENV NO_VNC_PORT=6080
-EXPOSE 6080
-
-# Copy all files into /home/jovyan
-COPY --chown=${NB_UID}:${NB_GID} . /home/jovyan/
-
-# Set up start script
-RUN chmod +x /home/jovyan/.binder/start.sh
-
-# Switch back to jovyan user
-USER $NB_UID
-
-# Start everything
-CMD ["/home/jovyan/.binder/start.sh"]
+# Default command
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
