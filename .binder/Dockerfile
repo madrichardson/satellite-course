@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages
-RUN pip install selenium python-pptx pandas Pillow requests webdriver-manager
+RUN pip install selenium python-pptx pandas Pillow requests webdriver-manager seaborn matplotlib
 
 # Set environment variables
 ENV DISPLAY=:1
