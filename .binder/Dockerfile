@@ -19,22 +19,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     supervisor \
     python3-pip \
     unzip \
+    chromium-browser \
+    chromium-chromedriver \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome
-RUN wget -q -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt install -y /tmp/google-chrome.deb && \
-    rm /tmp/google-chrome.deb
-
-# Install Chromedriver matching Chrome version
-RUN LATEST=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/${LATEST}/chromedriver_linux64.zip && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    rm /tmp/chromedriver.zip && \
-    chmod +x /usr/local/bin/chromedriver
-
 # Install Python packages
-RUN pip install selenium python-pptx pandas Pillow requests webdriver-manager seaborn matplotlib
+RUN pip install selenium python-pptx pandas Pillow requests seaborn matplotlib
 
 # Set environment variables
 ENV DISPLAY=:1
