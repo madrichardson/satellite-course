@@ -1,8 +1,10 @@
-
-# Start from official Binder base
+# Start from Binder's base image
 FROM jupyter/base-notebook
 
-# Install system packages
+# Set the working directory early so everything is inside /home/jovyan
+WORKDIR /home/jovyan
+
+# Install system packages for browser and GUI
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium-browser \
@@ -15,22 +17,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages
+# Install Python packages required for your notebook
 RUN pip install selenium python-pptx pandas Pillow requests webdriver-manager
 
-# Environment variables
+# Set environment variables
 ENV DISPLAY=:1
 ENV NO_VNC_PORT=6080
-
 EXPOSE 6080
 
-# Still as root:
-# Copy start.sh and set executable permissions
-COPY --chown=jovyan:users .binder/start.sh /home/jovyan/start.sh
+# Set up VNC and start script
+RUN mkdir -p /home/jovyan/.vnc
+COPY .binder/start.sh /home/jovyan/start.sh
 RUN chmod +x /home/jovyan/start.sh
 
-# Now back to jovyan user
+# Switch back to jovyan user (not root)
 USER $NB_UID
 
-# Start VNC + Desktop + Jupyter
+# Start VNC, noVNC, Fluxbox, and Jupyter
 CMD ["/home/jovyan/start.sh"]
