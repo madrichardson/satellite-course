@@ -1,8 +1,5 @@
 FROM jupyter/base-notebook:python-3.10
 
-USER root
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Install Chromium and dependencies
 RUN apt-get update && apt-get install -y \
     chromium-browser \
@@ -17,8 +14,6 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-USER jovyan
-
 # Install required Python packages
 RUN pip install --upgrade pip && pip install \
     selenium \
@@ -27,13 +22,14 @@ RUN pip install --upgrade pip && pip install \
     requests \
     pandas \
     matplotlib \
+    seaborn \
     webdriver-manager
 
-# Copy your notebook
-COPY new_create_ppt.ipynb /home/jovyan/
+# Copy your notebook into the container
+COPY new_create_ppt_DR.ipynb /home/jovyan/
 
 # Set working directory
 WORKDIR /home/jovyan/
 
-# Start Jupyter (manual execution)
+# Default command (Binder overrides this)
 CMD ["start-notebook.sh"]
